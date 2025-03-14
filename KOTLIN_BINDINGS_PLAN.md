@@ -28,6 +28,7 @@
    cd langchain-kmp
    ./gradlew build
    ```
+   
 
 ## Phase 3: Testing & Integration
 1. Create sample JVM app using:
