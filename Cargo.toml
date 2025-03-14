@@ -11,6 +11,11 @@ keywords = ["chain", "chatgpt", "llm", "langchain"]
 documentation = "https://langchain-rust.sellie.tech/get-started/quickstart"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+# Add library configuration for UniFFI
+[lib]
+name = "langchain_rust"
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
 scraper = "0.21"
 serde = { version = "1.0", features = ["derive"] }
@@ -84,6 +89,8 @@ ollama-rs = { version = "0.2.0", optional = true, features = [
     "chat-history",
 ] }
 mistralai-client = { version = "0.14.0", optional = true }
+# UniFFI dependencies
+uniffi = { version = "0.24.3" }
 
 
 [features]
@@ -121,6 +128,8 @@ tree-sitter = [
 base64 = "0.22.1"
 tokio-test = "0.4.4"
 testcontainers = "0.23"
+uniffi = { version = "0.24.3", features = ["bindgen-tests"] }
 
 [build-dependencies]
 cc = { version = "1", optional = true }
+uniffi = { version = "0.24.3", features = ["build"] }
