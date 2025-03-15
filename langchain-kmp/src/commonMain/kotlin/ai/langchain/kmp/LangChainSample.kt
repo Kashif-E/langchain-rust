@@ -4,37 +4,37 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import uniffi.langchain.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 
 /**
- * A helper class for LangChain functionality.
- * This implementation uses the Rust library via UniFFI bindings.
+ * A helper class for LangChain functionality that wraps the Rust implementation.
  */
 class LangChainSample {
     /**
      * Get the version of the langchain-rust library.
      * @return The version string.
      */
-    suspend fun getVersion(): String = withContext(Dispatchers.IO) {
-        get_version()
+    suspend fun getVersion(): String {
+        return get_version()
     }
     
     /**
      * Get list of available models from Ollama.
-     * This is specifically for Ollama. For other providers, you may need different implementations.
      * @return List of model information objects.
      */
-    suspend fun listModels(): List<OllamaModel> = withContext(Dispatchers.IO) {
-        // This is still a direct API call as it's not part of the core LangChain functionality
-        // In a production environment, you'd implement this using a native extension
+    suspend fun listModels(): List<OllamaModel> {
         try {
             val models = mutableListOf<OllamaModel>()
             
-            // Add a few example models that are commonly available
+            val currentTime = Clock.System.now().epochSeconds
+            
+            // Sample models for demonstration
             models.add(OllamaModel(
                 name = "llama3",
                 parameter_size = "8B",
                 size = 4_800_000_000,
-                modified = System.currentTimeMillis() / 1000,
+                modified = currentTime,
                 quantization_level = "Q4_K_M"
             ))
             
@@ -42,7 +42,7 @@ class LangChainSample {
                 name = "gemma",
                 parameter_size = "7B",
                 size = 4_200_000_000,
-                modified = System.currentTimeMillis() / 1000,
+                modified = currentTime,
                 quantization_level = "Q4_K_M"
             ))
             
@@ -50,18 +50,18 @@ class LangChainSample {
                 name = "mistral",
                 parameter_size = "7B",
                 size = 4_100_000_000,
-                modified = System.currentTimeMillis() / 1000,
+                modified = currentTime,
                 quantization_level = "Q4_K_M"
             ))
             
-            return@withContext models
+            return models
         } catch (e: Exception) {
             throw LangChainException("Failed to list models: ${e.message}")
         }
     }
     
     /**
-     * Make an API call to LLM with a prompt.
+     * Invoke a language model with a prompt.
      * @param prompt The prompt to send to the LLM.
      * @param modelName The name of the model to use.
      * @return The generated text.
@@ -69,31 +69,28 @@ class LangChainSample {
     suspend fun invokeModel(
         prompt: String, 
         modelName: String
-    ): String = withContext(Dispatchers.IO) {
+    ): String {
         try {
-            // Use the direct FFI function for a simple invocation
-            invoke_llm(modelName, prompt)
+            return invoke_llm(modelName, prompt)
         } catch (e: LangChainException) {
             throw LangChainException("Error invoking model: ${e.message}")
         }
     }
     
     /**
-     * Pull a model.
-     * This is specifically for Ollama and not core langchain functionality.
+     * Pull a model from Ollama.
      * @param modelName The name of the model to pull.
      * @return True if successful, false otherwise.
      */
-    suspend fun pullModel(modelName: String): Boolean = withContext(Dispatchers.IO) {
-        // This would need to be implemented with a native platform-specific API
-        // For now, we'll just return true to simulate success
-        return@withContext true
+    suspend fun pullModel(modelName: String): Boolean {
+        // Simplified implementation that would be replaced with actual API calls
+        return true
     }
     
     /**
-     * Simple LLM invocation similar to the old mock.
+     * Simple LLM invocation with default model.
      * @param prompt The prompt to send to the LLM.
-     * @param modelName The name of the model to use.
+     * @param modelName The name of the model to use, defaults to "gpt-4o-mini".
      * @return The generated text.
      */
     suspend fun simpleLlmInvocation(prompt: String, modelName: String = "gpt-4o-mini"): String {
@@ -101,7 +98,7 @@ class LangChainSample {
     }
     
     /**
-     * Exception thrown when an error occurs in the LangChain library.
+     * Exception class for LangChain-related errors.
      */
     class LangChainException(message: String) : Exception(message)
 }
@@ -120,7 +117,9 @@ data class OllamaModel(
     val parameter_size: String = "",
     val quantization_level: String = ""
 ) {
-    // Convert size to human-readable format
+    /**
+     * Format size to human-readable representation.
+     */
     fun getFormattedSize(): String {
         return when {
             size < 1024 -> "$size B"
@@ -130,11 +129,12 @@ data class OllamaModel(
         }
     }
     
-    // Format the modified timestamp to a readable date
+    /**
+     * Format timestamp to readable date string.
+     */
     fun getFormattedDate(): String {
-        val date = java.util.Date(modified * 1000)
-        val formatter = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-        return formatter.format(date)
+        val instant = Instant.fromEpochSeconds(modified)
+        return instant.toString()
     }
 }
 
@@ -145,7 +145,7 @@ data class OllamaModel(
 data class ChatMessage(
     val content: String,
     val isUser: Boolean,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = Clock.System.now().epochSeconds
 )
 
 /**

@@ -1,23 +1,40 @@
 namespace langchain {
+    /**
+     * Get the version of the langchain-rust library.
+     * @return Version string of the library.
+     */
     string get_version();
     
+    /**
+     * Invoke an LLM with a simple prompt.
+     * @param model_name The name of the model to use.
+     * @param prompt The prompt to send to the LLM.
+     * @return The generated text response.
+     * @throws LangChainError if an error occurs during invocation.
+     */
     [Throws=LangChainError]
     string invoke_llm(string model_name, string prompt);
 };
 
+/**
+ * Error types for LangChain operations.
+ */
 [Error]
 enum LangChainError {
-    "InvalidModel",
-    "ApiError",
-    "NetworkError", 
-    "InvalidArgument",
-    "TokenLimitExceeded",
-    "Unauthorized",
-    "ServerError",
-    "UnknownError"
+    "InvalidModel",      // The specified model doesn't exist or is not supported
+    "ApiError",          // Generic API error
+    "NetworkError",      // Error connecting to the service
+    "InvalidArgument",   // The provided parameters are invalid
+    "TokenLimitExceeded", // Token limit or rate limit exceeded
+    "Unauthorized",      // API key is invalid or missing
+    "ServerError",       // Server-side error
+    "UnknownError"       // Unknown or unclassified error
 };
 
+/**
+ * Message structure for chat interfaces.
+ */
 dictionary Message {
-    string content;
-    string message_type;
+    string content;      // The content of the message
+    string message_type; // Type of the message: "human", "ai", "system", or "tool"
 };

@@ -10,12 +10,13 @@ UDL_FILE="$RUST_PROJECT_ROOT/src/langchain.udl"
 KMP_PROJECT="$RUST_PROJECT_ROOT/langchain-kmp"
 OUTPUT_DIR="$KMP_PROJECT/src/commonMain/kotlin"
 
-# Install uniffi_bindgen from source
-echo "Installing uniffi-bindgen from source..."
-git clone https://github.com/mozilla/uniffi-rs.git
-cd uniffi-rs
-cargo build -p uniffi_bindgen
-cd ..
+# Check if gobley-uniffi-bindgen is installed
+if command -v gobley-uniffi-bindgen &> /dev/null; then
+    echo "Gobley is already installed."
+else
+    echo "Gobley not found. Installing Gobley..."
+    cargo install gobley-uniffi-bindgen
+fi
 
 # Build Rust project
 echo "Building Rust project..."
@@ -29,9 +30,9 @@ mkdir -p "$KMP_PROJECT/src/androidMain/jniLibs/armeabi-v7a"
 mkdir -p "$KMP_PROJECT/src/androidMain/jniLibs/x86"
 mkdir -p "$KMP_PROJECT/src/androidMain/jniLibs/x86_64"
 
-# Generate Kotlin bindings
-echo "Generating Kotlin bindings..."
-./uniffi-rs/target/debug/uniffi-bindgen generate "$UDL_FILE" --language kotlin --out-dir "$OUTPUT_DIR"
+# Generate Kotlin bindings with Gobley
+echo "Generating Kotlin bindings with Gobley..."
+gobley-uniffi-bindgen "$UDL_FILE" --out-dir "$OUTPUT_DIR"
 
 # Detect OS and architecture
 OS="$(uname)"

@@ -7,11 +7,12 @@ use thiserror::Error;
 use once_cell::sync::Lazy;
 use tokio::runtime::Runtime;
 
-// Global singleton Tokio runtime for all FFI calls
+/// Global singleton Tokio runtime for efficient FFI calls
 static RUNTIME: Lazy<Runtime> = Lazy::new(|| {
     Runtime::new().expect("Failed to create Tokio runtime")
 });
 
+/// Error types for LangChain bindings
 #[derive(Error, Debug)]
 pub enum LangChainError {
     #[error("Invalid model specified")]
@@ -39,6 +40,7 @@ pub enum LangChainError {
     UnknownError(String),
 }
 
+/// Convert internal LLM errors to FFI-friendly LangChainError
 impl From<LLMError> for LangChainError {
     fn from(err: LLMError) -> Self {
         match err {
@@ -64,12 +66,14 @@ impl From<LLMError> for LangChainError {
     }
 }
 
+/// Message structure for FFI
 #[derive(Debug, Clone)]
 pub struct Message {
     pub content: String,
     pub message_type: String,
 }
 
+/// Convert FFI Message to internal Rust Message
 impl From<Message> for RustMessage {
     fn from(msg: Message) -> Self {
         match msg.message_type.as_str() {
@@ -81,6 +85,7 @@ impl From<Message> for RustMessage {
     }
 }
 
+/// Convert internal Rust Message to FFI Message
 impl From<RustMessage> for Message {
     fn from(msg: RustMessage) -> Self {
         let message_type = match msg.message_type {
@@ -97,11 +102,19 @@ impl From<RustMessage> for Message {
     }
 }
 
-// Top-level functions
+/// Get the library version
+/// 
+/// Returns the version string of the langchain-rust library
 pub fn get_version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
 }
 
+/// Invoke a language model with a prompt
+/// 
+/// @param model_name The name of the model to use
+/// @param prompt The prompt text to send to the model
+/// @return The generated text response
+/// @throws LangChainError if the invocation fails
 pub fn invoke_llm(model_name: String, prompt: String) -> Result<String, LangChainError> {
     let model = OpenAI::default().with_model(model_name);
     RUNTIME.block_on(model.invoke(&prompt)).map_err(|e| e.into())
