@@ -26,7 +26,7 @@ kotlin {
         }
     }
     
-    // Native targets
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -38,12 +38,11 @@ kotlin {
         }
     }
     
-    // Optional Android target (uncomment if needed)
-    /*
+
     androidTarget {
         publishLibraryVariants("release", "debug")
     }
-    */
+
     
     sourceSets {
         val commonMain by getting {
@@ -108,7 +107,7 @@ mavenPublishing {
             developer {
                 id.set("kashif-mehmood-km")
                 name.set("Kashif")
-                email.set("your.email@example.com")
+                email.set("kashismails@gmail.com")
             }
         }
         scm {
