@@ -54,19 +54,6 @@ Add the library to your Kotlin project:
 implementation("io.github.kashif-mehmood-km:langchain-kmp:0.1.0")
 ```
 
-### JVM/Android
-
-```kotlin
-implementation("io.github.kashif-mehmood-km:langchain-kmp-jvm:0.1.0")
-implementation("io.github.kashif-mehmood-km:langchain-kmp-android:0.1.0")
-```
-
-### iOS (via CocoaPods)
-
-```ruby
-pod 'langchain_kmp', '~> 0.1.0'
-```
-
 ## 🔍 Basic Usage
 
 ```kotlin
