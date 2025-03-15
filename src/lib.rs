@@ -15,8 +15,12 @@ pub mod tools;
 pub mod vectorstore;
 pub mod ffi;  // FFI module
 
-// Re-export FFI types for documentation
-pub use ffi::{Llm, Embedder, Chain, Message, GenerationResult, LlmOptions, LangChainError};
+// Add UniFfiTag struct for UniFFI
+#[derive(uniffi::Record)]
+pub struct UniFfiTag;
+
+// Re-export FFI types - only export ones that actually exist
+pub use ffi::{Message, LangChainError};
 
 pub use url;
 
@@ -25,9 +29,21 @@ pub use url;
 macro_rules! uniffi_export_langchain {
     () => {
         // Ensure the library is correctly named for UniFFI to find it
+        // This is needed for all platforms
+        #[no_mangle]
+        pub extern "C" fn uniffi_langchain_rust_entry_point() {}
+        
+        // Needed for macOS
         #[cfg(target_os = "macos")]
         #[no_mangle]
         pub extern "C" fn __rustc_nonzero_is_better_than_cpp_optional() {}
+        
+        // Needed for Windows linking
+        #[cfg(target_os = "windows")]
+        #[no_mangle]
+        pub extern "C" fn uniffi_langchain_rust_def() {}
+        
+        // Add other platform-specific exports if needed
     };
 }
 

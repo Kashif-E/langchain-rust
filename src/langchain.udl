@@ -1,75 +1,23 @@
 namespace langchain {
-    // Core LLM functionality
-    string invoke_llm(string model_name, string prompt);
-    
-    // Simple but useful utility functions
     string get_version();
+    
+    [Throws=LangChainError]
+    string invoke_llm(string model_name, string prompt);
 };
 
-// Define error types
 [Error]
 enum LangChainError {
     "InvalidModel",
     "ApiError",
-    "NetworkError",
+    "NetworkError", 
     "InvalidArgument",
     "TokenLimitExceeded",
     "Unauthorized",
     "ServerError",
-    "UnknownError",
+    "UnknownError"
 };
 
-// Define a message interface for LLMs
 dictionary Message {
     string content;
     string message_type;
-};
-
-// Define a simple result type to capture generation results
-dictionary GenerationResult {
-    string text;
-    u32? prompt_tokens = null;
-    u32? completion_tokens = null;
-    u32? total_tokens = null;
-};
-
-// Define LLM options
-dictionary LlmOptions {
-    double? temperature = null;
-    u32? max_tokens = null;
-    sequence<string>? stop_words = null;
-};
-
-// Define an LLM interface
-interface Llm {
-    constructor(string model_name);
-    
-    [Throws=LangChainError]
-    string invoke(string prompt);
-    
-    [Throws=LangChainError]
-    GenerationResult generate(sequence<Message> messages, LlmOptions? options = null);
-};
-
-// Define an embedding interface
-interface Embedder {
-    constructor(string model_name);
-    
-    [Throws=LangChainError]
-    sequence<float> embed_query(string text);
-    
-    [Throws=LangChainError]
-    sequence<sequence<float>> embed_documents(sequence<string> texts);
-};
-
-// Define a simple chain interface
-interface Chain {
-    [Name=new_llm_chain]
-    constructor(string prompt_template, Llm llm);
-    
-    [Throws=LangChainError]
-    string run(string input);
-    
-    [Throws=LangChainError]
-    string run_with_context(string input, sequence<Message> context);
 };
